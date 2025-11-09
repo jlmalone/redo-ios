@@ -79,7 +79,7 @@ public struct RedoTask: Identifiable, Codable, Equatable {
         guard let todo = currentPendingTask else { return 0 }
 
         let urgency = calculateUrgency(for: todo, at: date)
-        let complexity = sqrt(storyPoints)
+        let complexity = sqrt(Double(storyPoints))
         let priorityWeight = Double(priority)
         let circadianBonus = isInMorningHours(date) ? 1.15 : 1.0
 
