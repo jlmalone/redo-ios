@@ -149,9 +149,9 @@ public class AdvancedAnalyticsCalculator {
             let completedCount = completedThisDay.count
 
             // Calculate story points completed
-            let taskIds = Set(completedThisDay.map { $0.taskId })
+            let taskIds = Set(completedThisDay.map { $0.redoParentGuid })
             let storyPoints = tasks
-                .filter { taskIds.contains($0.guid.uuidString) }
+                .filter { taskIds.contains($0.guid) }
                 .reduce(Float(0)) { $0 + $1.storyPoints }
 
             // Calculate average completion time
@@ -222,9 +222,9 @@ public class AdvancedAnalyticsCalculator {
         let completedCount = completedThisWeek.count
 
         // Story points completed
-        let taskIds = Set(completedThisWeek.map { $0.taskId })
+        let taskIds = Set(completedThisWeek.map { $0.redoParentGuid })
         let storyPoints = tasks
-            .filter { taskIds.contains($0.guid.uuidString) }
+            .filter { taskIds.contains($0.guid) }
             .reduce(Float(0)) { $0 + $1.storyPoints }
 
         // Average completion time
