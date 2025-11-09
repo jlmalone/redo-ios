@@ -8,7 +8,7 @@ import Intents
 class CreateTaskIntent: INIntent {
     @NSManaged var title: String?
     @NSManaged var taskDescription: String?
-    @NSManaged var priority: TaskPriority?
+    @NSManaged var priority: NSNumber?
 }
 
 @available(iOS 16.0, *)
@@ -152,7 +152,7 @@ class PriorityResolutionResult: INIntentResolutionResult {
         return result
     }
 
-    static func needsValue() -> PriorityResolutionResult {
+    static func needsValue() -> Self {
         return PriorityResolutionResult()
     }
 }
@@ -177,36 +177,5 @@ class PriorityResolutionResult: INIntentResolutionResult {
 }
 
 // MARK: - Intent Extensions
-
-@available(iOS 16.0, *)
-extension CreateTaskIntent {
-    override var description: String {
-        return "Create a new task in Redo"
-    }
-
-    override var suggestedInvocationPhrase: String? {
-        return "Create a task"
-    }
-}
-
-@available(iOS 16.0, *)
-extension CompleteTaskIntent {
-    override var description: String {
-        return "Complete a task in Redo"
-    }
-
-    override var suggestedInvocationPhrase: String? {
-        return "Complete my task"
-    }
-}
-
-@available(iOS 16.0, *)
-extension ViewTasksIntent {
-    override var description: String {
-        return "View your tasks in Redo"
-    }
-
-    override var suggestedInvocationPhrase: String? {
-        return "Show my tasks"
-    }
-}
+// Note: Suggested invocation phrases are defined in Intents.intentdefinition file
+// rather than in code for legacy Intents framework

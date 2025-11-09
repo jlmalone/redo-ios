@@ -57,8 +57,7 @@ struct CreateTaskAppIntent: AppIntent {
 
         // Success
         return .result(
-            dialog: "Created task '\(title)' with priority \(validPriority)",
-            view: TaskCreatedView(title: title, priority: validPriority)
+            dialog: "Created task '\(title)' with priority \(validPriority)"
         )
     }
 }
@@ -89,7 +88,8 @@ struct CompleteTaskAppIntent: AppIntent {
         }
 
         let storage = ChangeLogStorage()
-        let reconstructor = StateReconstructor()
+        let validator = ChangeLogValidator()
+        let reconstructor = StateReconstructor(validator: validator)
 
         // Load tasks
         let changes = try storage.getAllChanges(userId: userId)
@@ -154,7 +154,8 @@ struct ViewTasksAppIntent: AppIntent {
         }
 
         let storage = ChangeLogStorage()
-        let reconstructor = StateReconstructor()
+        let validator = ChangeLogValidator()
+        let reconstructor = StateReconstructor(validator: validator)
 
         let changes = try storage.getAllChanges(userId: userId)
         var tasks = try reconstructor.reconstructTasks(from: changes)
@@ -169,8 +170,7 @@ struct ViewTasksAppIntent: AppIntent {
         let topTasks = Array(tasks.prefix(5))
 
         return .result(
-            dialog: "You have \(taskCount) \(filter.displayName) tasks",
-            view: TaskListSnippetView(tasks: topTasks, totalCount: taskCount, filter: filter)
+            dialog: "You have \(taskCount) \(filter.displayName) tasks"
         )
     }
 }
@@ -191,8 +191,11 @@ struct QuickAddTaskIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        let intent = CreateTaskAppIntent(title: title, taskDescription: "", priority: 3)
-        let result = try await intent.perform()
+        let intent = CreateTaskAppIntent()
+        intent.title = title
+        intent.taskDescription = ""
+        intent.priority = 3
+        _ = try await intent.perform()
         return .result(dialog: "Added '\(title)'")
     }
 }
@@ -237,90 +240,9 @@ enum TaskFilterOption: String, AppEnum {
     }
 }
 
-// MARK: - Snippet Views
-
-@available(iOS 16.0, macOS 13.0, watchOS 9.0, *)
-struct TaskCreatedView: View {
-    let title: String
-    let priority: Int
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
-                Text("Task Created")
-                    .font(.headline)
-            }
-
-            Text(title)
-                .font(.body)
-
-            HStack {
-                ForEach(0..<priority, id: \.self) { _ in
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
-                        .font(.caption)
-                }
-                Text("Priority \(priority)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .padding()
-    }
-}
-
-@available(iOS 16.0, macOS 13.0, watchOS 9.0, *)
-struct TaskListSnippetView: View {
-    let tasks: [RedoTask]
-    let totalCount: Int
-    let filter: TaskFilterOption
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("\(totalCount) \(filter.displayName) tasks")
-                .font(.headline)
-
-            if tasks.isEmpty {
-                Text("No tasks to show")
-                    .foregroundColor(.secondary)
-            } else {
-                ForEach(tasks.prefix(5), id: \.guid) { task in
-                    HStack {
-                        ForEach(0..<task.priority, id: \.self) { _ in
-                            Circle()
-                                .fill(priorityColor(for: task.priority))
-                                .frame(width: 6, height: 6)
-                        }
-
-                        Text(task.title)
-                            .font(.body)
-                            .lineLimit(1)
-
-                        if task.isOverdue {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.red)
-                                .font(.caption)
-                        }
-                    }
-                }
-            }
-        }
-        .padding()
-    }
-
-    private func priorityColor(for priority: Int) -> Color {
-        switch priority {
-        case 1: return .green
-        case 2: return .blue
-        case 3: return .yellow
-        case 4: return .orange
-        case 5: return .red
-        default: return .gray
-        }
-    }
-}
+// MARK: - Snippet Views removed
+// Note: SwiftUI views removed as they're not compatible with Intents extension
+// App Intents in iOS 16+ use dialog-based results instead
 
 // MARK: - Shortcuts Provider
 
