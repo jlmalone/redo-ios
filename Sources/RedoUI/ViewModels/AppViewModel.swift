@@ -467,18 +467,15 @@ public class AppViewModel: ObservableObject {
     // MARK: - Filtering
 
     private func setupObservers() {
-        // Update filtered tasks when filters change
-        Publishers.CombineLatest4(
-            Publishers.CombineLatest4($tasks, $showArchived, $searchText, $selectedPriority),
-            Publishers.CombineLatest3($selectedPriorities, $showOnlyOverdue, $showOnlyActive),
-            Publishers.CombineLatest3($searchScope, $sortOption, $dateFilter)
-        ) { tuple1, tuple2, tuple3 in
-            return (tuple1, tuple2, tuple3)
-        }
-        .sink { [weak self] _ in
-            self?.applyFilters()
-        }
-        .store(in: &cancellables)
+        // Update filtered tasks when any filter changes
+        $tasks
+            .combineLatest($showArchived, $searchText, $selectedPriority)
+            .combineLatest($selectedPriorities, $showOnlyOverdue, $showOnlyActive)
+            .combineLatest($searchScope, $sortOption, $dateFilter)
+            .sink { [weak self] _ in
+                self?.applyFilters()
+            }
+            .store(in: &cancellables)
     }
 
     private func applyFilters() {
