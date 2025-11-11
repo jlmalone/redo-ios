@@ -1,6 +1,7 @@
 import Foundation
 import FirebaseAuth
 import GoogleSignIn
+import RedoCore
 
 /// Manages Google OAuth authentication for Firebase
 @MainActor
