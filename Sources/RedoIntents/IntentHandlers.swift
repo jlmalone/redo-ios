@@ -1,6 +1,7 @@
 import Foundation
 import Intents
 import RedoCore
+import RedoCrypto
 
 // MARK: - Create Task Intent Handler
 
