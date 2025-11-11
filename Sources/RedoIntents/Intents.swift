@@ -15,7 +15,7 @@ class CreateTaskIntent: INIntent {
 @objc protocol CreateTaskIntentHandling {
     func handle(intent: CreateTaskIntent) async -> CreateTaskIntentResponse
     @objc optional func resolveTitle(for intent: CreateTaskIntent) async -> INStringResolutionResult
-    @objc optional func resolvePriority(for intent: CreateTaskIntent) async -> PriorityResolutionResult
+    @objc optional func resolvePriority(for intent: CreateTaskIntent) async -> INIntegerResolutionResult
 }
 
 @available(iOS 16.0, *)
@@ -118,44 +118,7 @@ class ViewTasksIntentResponse: INIntentResponse {
 }
 
 // MARK: - Supporting Types
-
-@available(iOS 16.0, *)
-@objc enum TaskPriority: Int {
-    case unknown = 0
-    case low = 1
-    case mediumLow = 2
-    case medium = 3
-    case high = 4
-    case urgent = 5
-
-    var displayString: String {
-        switch self {
-        case .unknown: return "Unknown"
-        case .low: return "Low"
-        case .mediumLow: return "Medium-Low"
-        case .medium: return "Medium"
-        case .high: return "High"
-        case .urgent: return "Urgent"
-        }
-    }
-}
-
-@available(iOS 16.0, *)
-class PriorityResolutionResult: INIntentResolutionResult {
-    static func success(with resolvedValue: TaskPriority) -> PriorityResolutionResult {
-        let result = PriorityResolutionResult()
-        return result
-    }
-
-    static func confirmationRequired(with valueToConfirm: TaskPriority) -> PriorityResolutionResult {
-        let result = PriorityResolutionResult()
-        return result
-    }
-
-    static func needsValue() -> Self {
-        return PriorityResolutionResult()
-    }
-}
+// Note: Priority is now handled as NSNumber (Int 1-5) for Objective-C compatibility
 
 @available(iOS 16.0, *)
 @objc enum TaskFilter: Int {
