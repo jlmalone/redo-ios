@@ -206,11 +206,11 @@ public struct FilterPresetsView: View {
         if let filterType = preset.dateFilterType {
             let type: DateFilter.DateFilterType = filterType == "created" ? .created : .dueDate
 
-            let startDate: Date? = preset.dateFilterStartDays.map {
+            let startDate: Date? = preset.dateFilterStartDays.flatMap {
                 Calendar.current.date(byAdding: .day, value: -$0, to: Date())
             }
 
-            let endDate: Date? = preset.dateFilterEndDays.map {
+            let endDate: Date? = preset.dateFilterEndDays.flatMap {
                 Calendar.current.date(byAdding: .day, value: -$0, to: Date())
             }
 
