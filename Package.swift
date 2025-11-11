@@ -7,10 +7,6 @@ let package = Package(
         .iOS(.v17)
     ],
     products: [
-        .executable(
-            name: "Redo",
-            targets: ["App"]
-        ),
         .library(
             name: "RedoCore",
             targets: ["RedoCore"]
@@ -80,17 +76,6 @@ let package = Package(
                 "RedoCore",
                 "RedoCrypto"
             ]
-        ),
-
-        // Main iOS App
-        .executableTarget(
-            name: "App",
-            dependencies: [
-                "RedoUI",
-                "RedoCore",
-                "RedoCrypto"
-            ],
-            path: "App"
         ),
 
         // Tests
