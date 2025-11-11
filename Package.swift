@@ -74,7 +74,8 @@ let package = Package(
         .target(
             name: "RedoIntents",
             dependencies: [
-                "RedoCore"
+                "RedoCore",
+                "RedoCrypto"
             ]
         ),
 

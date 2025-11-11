@@ -3,6 +3,8 @@ import Foundation
 /// Reconstructs current task state from immutable change log (event sourcing)
 public class StateReconstructor {
 
+    public init() {}
+
     // MARK: - Public API
 
     /// Reconstruct all tasks from change log

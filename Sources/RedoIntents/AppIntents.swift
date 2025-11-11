@@ -1,6 +1,7 @@
 import Foundation
 import AppIntents
 import RedoCore
+import RedoCrypto
 
 // MARK: - Create Task App Intent (iOS 16+)
 
@@ -23,7 +24,7 @@ struct CreateTaskAppIntent: AppIntent {
     }
 
     @MainActor
-    func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
+    func perform() async throws -> some IntentResult & ProvidesDialog {
         // Get user ID
         let keychain = KeychainService()
         guard let userId = try? keychain.loadUserId() else {
@@ -88,8 +89,7 @@ struct CompleteTaskAppIntent: AppIntent {
         }
 
         let storage = ChangeLogStorage()
-        let validator = ChangeLogValidator()
-        let reconstructor = StateReconstructor(validator: validator)
+        let reconstructor = StateReconstructor()
 
         // Load tasks
         let changes = try storage.getAllChanges(userId: userId)
@@ -147,15 +147,14 @@ struct ViewTasksAppIntent: AppIntent {
     }
 
     @MainActor
-    func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
+    func perform() async throws -> some IntentResult & ProvidesDialog {
         let keychain = KeychainService()
         guard let userId = try? keychain.loadUserId() else {
             throw IntentError.message("Not authenticated")
         }
 
         let storage = ChangeLogStorage()
-        let validator = ChangeLogValidator()
-        let reconstructor = StateReconstructor(validator: validator)
+        let reconstructor = StateReconstructor()
 
         let changes = try storage.getAllChanges(userId: userId)
         var tasks = try reconstructor.reconstructTasks(from: changes)

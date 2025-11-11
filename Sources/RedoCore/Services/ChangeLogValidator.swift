@@ -3,6 +3,8 @@ import Foundation
 /// Strict v1 protocol validation for change log entries
 public class ChangeLogValidator {
 
+    public init() {}
+
     // MARK: - Main Validation
 
     /// Validate that a change log entry conforms to v1 protocol
