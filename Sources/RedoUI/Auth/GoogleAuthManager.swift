@@ -88,9 +88,9 @@ public class GoogleAuthManager: ObservableObject {
         let keychain = KeychainService()
 
         // Use separate keys from crypto keys
-        try keychain.save(idToken, forKey: "googleIDToken")
-        try keychain.save(accessToken, forKey: "googleAccessToken")
-        try keychain.save(refreshToken, forKey: "googleRefreshToken")
+        try keychain.save(string: idToken, forKey: "googleIDToken")
+        try keychain.save(string: accessToken, forKey: "googleAccessToken")
+        try keychain.save(string: refreshToken, forKey: "googleRefreshToken")
     }
 
     private func clearOAuthTokens() throws {
@@ -105,7 +105,7 @@ public class GoogleAuthManager: ObservableObject {
     public func getGoogleAccessToken() async throws -> String {
         let keychain = KeychainService()
 
-        if let token = try? keychain.load(forKey: "googleAccessToken") {
+        if let token = try keychain.loadString(forKey: "googleAccessToken") {
             // Check if token is still valid
             if try await isTokenValid(token) {
                 return token
@@ -140,7 +140,7 @@ public class GoogleAuthManager: ObservableObject {
 
         // Store new token
         let keychain = KeychainService()
-        try keychain.save(newAccessToken, forKey: "googleAccessToken")
+        try keychain.save(string: newAccessToken, forKey: "googleAccessToken")
 
         return newAccessToken
     }
@@ -197,58 +197,3 @@ public enum AuthError: LocalizedError {
     }
 }
 
-// MARK: - Keychain Extension for OAuth Tokens
-
-extension KeychainService {
-    func save(_ value: String, forKey key: String) throws {
-        let data = value.data(using: .utf8)!
-
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecValueData as String: data
-        ]
-
-        // Delete existing item
-        SecItemDelete(query as CFDictionary)
-
-        // Add new item
-        let status = SecItemAdd(query as CFDictionary, nil)
-
-        guard status == errSecSuccess else {
-            throw KeychainError.unhandledError(status: status)
-        }
-    }
-
-    func load(forKey key: String) throws -> String {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecReturnData as String: true
-        ]
-
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-
-        guard status == errSecSuccess,
-              let data = result as? Data,
-              let value = String(data: data, encoding: .utf8) else {
-            throw KeychainError.itemNotFound
-        }
-
-        return value
-    }
-
-    func delete(forKey key: String) throws {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key
-        ]
-
-        let status = SecItemDelete(query as CFDictionary)
-
-        guard status == errSecSuccess || status == errSecItemNotFound else {
-            throw KeychainError.unhandledError(status: status)
-        }
-    }
-}
