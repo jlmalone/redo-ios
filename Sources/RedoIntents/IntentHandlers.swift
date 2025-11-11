@@ -56,11 +56,14 @@ class CreateTaskIntentHandler: NSObject, CreateTaskIntentHandling {
         return INStringResolutionResult.success(with: title)
     }
 
-    func resolvePriority(for intent: CreateTaskIntent) async -> PriorityResolutionResult {
+    func resolvePriority(for intent: CreateTaskIntent) async -> INIntegerResolutionResult {
         guard let priority = intent.priority else {
-            return PriorityResolutionResult.success(with: .medium)
+            return INIntegerResolutionResult.success(with: 3) // Default: medium priority
         }
-        return PriorityResolutionResult.success(with: priority)
+        let priorityInt = priority.intValue
+        // Clamp to valid range 1-5
+        let validPriority = min(max(priorityInt, 1), 5)
+        return INIntegerResolutionResult.success(with: validPriority)
     }
 }
 
